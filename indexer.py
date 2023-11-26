@@ -47,7 +47,7 @@ def get_rows(index, words, columns_to_index):
 
 def run_search(index, cols):
     #filter words(operator: AND)
-    input_words = ["hindu", "english"]
+    input_words = ["english","hindu"]
     rows = get_rows(index, input_words, cols)
 
     print(f"\nrows that contain the words < {' AND '.join(input_words)} > :")
