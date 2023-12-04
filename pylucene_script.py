@@ -14,6 +14,7 @@ from org.apache.lucene.search import TermQuery
 from org.apache.lucene.index import Term
 from java.nio.file import Paths
 from enum import Enum, auto
+import time
 
 class SearchableFields(Enum):
     Name = "Name"
@@ -70,20 +71,23 @@ def search_index(search_field, search_term, num_records = 10):
     query_parser = QueryParser(field_name, analyzer)
     query = query_parser.parse(search_term)
     hits = searcher.search(query, num_records).scoreDocs
-    print(f"Found {len(hits)} matches for '{search_term}' in '{field_name}'.")
+    print(f"Found {len(hits)} matches for '{search_term}' in '{field_name}'.\n")
     
     for hit in hits:
         doc = searcher.doc(hit.doc)
         print(f"Name: {doc.get('Name')} - {field_name}: {doc.get(field_name)}")
+    print("\n")
+
+    return hits
 
 
 def base_search_loop():
     while(True):
-        print("Fields you can search by:")
+        print("Fields you can search by:\n")
         for field in SearchableFields:
             print(field.value)
 
-        search_field_input = input("Enter the field to search by(type exit to exit): ")
+        search_field_input = input("Enter the field to search by(type exit to exit): \n")
         search_field_input = search_field_input.capitalize()
         if search_field_input == "Exit":
             print("Exiting the function\n")
@@ -91,48 +95,72 @@ def base_search_loop():
         if search_field_input not in SearchableFields:
             print("Incorrect field name passed\n")
             continue
-        search_term_input = input(f"Enter the search term for {search_field_input}: ")
+        search_term_input = input(f"Enter the search term for {search_field_input}: \n")
 
         search_index(search_field_input, search_term_input)
 
 
 def synonym_search_loop():
     while(True):
-        searched_name = input("Enter the name you want synonyms for(type exit to exit): ")
+        searched_name = input("Enter the name you want synonyms for(type exit to exit): \n")
         searched_name = searched_name.capitalize()
         if searched_name == "Exit":
             print("Exiting the function\n")
             break
 
-        field_name = SearchableFields["Synonym"].value
-        query_parser = QueryParser(field_name, analyzer)
-        query = query_parser.parse(searched_name)
-        hits = searcher.search(query, 10000).scoreDocs
-        print(f"Found {len(hits)} matches for synonyms of the name {searched_name}.")
-    
-        for hit in hits:
-            doc = searcher.doc(hit.doc)
-            print(f"Name: {doc.get('Name')} - Synonym: {doc.get('Synonym')}")
-        print("")
+        search_index("Synonym", searched_name, num_records=1000)
+
+
+def test_base_search():
+    start_time = time.time()
+    hits = search_index("Origin", "American")
+    expected_output=["AMBERLEE","AMBERLYN", "ANALY", "ANNALYNN", "ARLEANA", "BAILON", "BITSIE", "BRENDA LEE", "BRINLEE", "BUTCH"]
+    i=0
+    assert len(hits) == len(expected_output)
+    for hit in hits:
+        name = searcher.doc(hit.doc).get("Name")
+        assert str(name) == expected_output[i]
+        i+=1
+
+    print(f"########################\n########################\nBASE SEARCH TEST WAS SUCCESSFUL IN {time.time()-start_time} seconds!\n########################\n########################\n")
+
+
+def test_synonym_search():
+    start_time = time.time()
+    hits = search_index("Synonym", "Jan", num_records=1000)
+    expected_output=["JANECEK", "JANEIK", "JANEK", "JANKO", "JANNIK"]
+    i=0
+    assert len(hits) == len(expected_output)
+    for hit in hits:
+        name = searcher.doc(hit.doc).get("Name")
+        assert str(name) == expected_output[i]
+        i+=1
+
+    print(f"########################\n########################\nSYNONYM SEARCH TEST WAS SUCCESSFUL IN {time.time()-start_time} seconds!\n########################\n########################\n")
 
 
 def main_loop():
     while(True):
-        print("Methods you can search by:")
+        print("Methods you can search by:\n")
         for field in SearchMethods:
             print(field.value)
-        menu_option_input = input("Enter the method to search by(type exit to exit): ")
+        print("! You can also trigger unit tests by typing 'unit tests'")
+        menu_option_input = input("Enter the method to search by(type exit to exit): \n")
         menu_option_input = menu_option_input.lower()
         if menu_option_input == "exit":
             print("Exiting the function\n")
             break
-        if menu_option_input not in SearchMethods:
+        if menu_option_input == "unit tests":
+            test_base_search()
+            test_synonym_search()
+        elif menu_option_input not in SearchMethods:
             print("Incorrect field name passed\n")
             continue
         if menu_option_input == "base search":
             base_search_loop()
         if menu_option_input == "synonym search":
             synonym_search_loop()
+        
             
 
 main_loop()
