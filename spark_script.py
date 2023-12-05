@@ -35,7 +35,7 @@ dump_df = df.withColumn("text_content", col("revision.text._VALUE")) \
     .filter(contains_given_name_category_udf(col("text_content"))) \
     .select(
         upper(col("title")).alias("name"),
-        col("text_content").substr(1, 100).alias("wiki_data")
+        col("text_content").substr(1, 1000).alias("wiki_data")
     )
 
 #load the spark dump df into pandas df
