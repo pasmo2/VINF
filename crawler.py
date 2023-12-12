@@ -5,7 +5,7 @@ import csv
 import re
 import html
 
-
+#function that downloads data from our website, scrapes all of the data we need, goes through multiple layers of web pages
 def download_website(url, base_url):
     data = {"url": [], "html_data": []}
     response = requests.get(url)
@@ -46,7 +46,7 @@ def download_website(url, base_url):
 
     return data
 
-
+#this function writes the raw data to our csv
 def write_raw_data(url, base_url):
     data = download_website(url, base_url)
 
@@ -54,7 +54,7 @@ def write_raw_data(url, base_url):
 
     df.to_csv('raw_data.csv', index=False)
 
-
+#this function gets the data from our raw data form to a nicer, more formed data form
 def scrape_data(link, content, name_data):
     content = html.unescape(content)
     pattern_baby_name = r'<div class="cal-row"[\s\S]*?<div class="sm-col"><p>Baby Name:</p></div>[\s\S]*?<span>(.*?)</span>'

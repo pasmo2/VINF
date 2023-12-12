@@ -65,7 +65,7 @@ writer.close()
 index_reader = DirectoryReader.open(index_dir)
 searcher = IndexSearcher(index_reader)
 
-
+#function that searches within the indexed data
 def search_index(search_field, search_term, num_records = 10):
     field_name = SearchableFields[search_field].value
     query_parser = QueryParser(field_name, analyzer)
@@ -80,7 +80,7 @@ def search_index(search_field, search_term, num_records = 10):
 
     return hits
 
-
+#function that starts the console loop for basic searching by field name and value
 def base_search_loop():
     while(True):
         print("Fields you can search by:\n")
@@ -99,7 +99,7 @@ def base_search_loop():
 
         search_index(search_field_input, search_term_input)
 
-
+#function that starts the console loop for synonym searching
 def synonym_search_loop():
     while(True):
         searched_name = input("Enter the name you want synonyms for(type exit to exit): \n")
@@ -110,7 +110,7 @@ def synonym_search_loop():
 
         search_index("Synonym", searched_name, num_records=1000)
 
-
+#unit test for the base search
 def test_base_search():
     start_time = time.time()
     hits = search_index("Origin", "American")
@@ -124,7 +124,7 @@ def test_base_search():
 
     print(f"########################\n########################\nBASE SEARCH TEST WAS SUCCESSFUL IN {time.time()-start_time} seconds!\n########################\n########################\n")
 
-
+#unit test for the synonym search
 def test_synonym_search():
     start_time = time.time()
     hits = search_index("Synonym", "Jan", num_records=1000)
@@ -138,7 +138,7 @@ def test_synonym_search():
 
     print(f"########################\n########################\nSYNONYM SEARCH TEST WAS SUCCESSFUL IN {time.time()-start_time} seconds!\n########################\n########################\n")
 
-
+#the main loop played in the console
 def main_loop():
     while(True):
         print("Methods you can search by:\n")
